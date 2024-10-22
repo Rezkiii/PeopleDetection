@@ -36,9 +36,11 @@ while True:
         # Mengirim data ke API dengan IP yang benar dan port 5000
         payload = {
             'timestamp': current_time,
-            'detected_people': "tidak_dikenali"
+            'detected_people': 0  # Mengubah menjadi integer
         }
-        requests.post("http://10.2.3.161:5000/data", json=payload)
+        
+        response = requests.post("http://10.2.3.161:5000/data", json=payload)
+        print(response.status_code, response.json())  # Cek respons API
 
         # Mengambil URL untuk perangkat lain
         requests.get("http://10.2.3.193/1")
