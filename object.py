@@ -1,51 +1,49 @@
 import cv2
 import requests
 
-# Menggunakan webcam (biasanya index 0 untuk webcam pertama)
+# Inisialisasi deteksi wajah dengan Haar Cascade
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+# Menggunakan kamera default
 cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
-# Inisialisasi detektor HOG
-hog = cv2.HOGDescriptor()
-hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+# Membuat jendela dengan ukuran yang dapat disesuaikan
+cv2.namedWindow('Kamera', cv2.WINDOW_NORMAL)
+cv2.resizeWindow('Kamera', 800, 600)  # Mengubah ukuran jendela
 
-if not cap.isOpened():
-    print("Tidak dapat mengakses kamera.")
-else:
-    while True:
-        # Membaca frame dari webcam
-        ret, frame = cap.read()
+while True:
+    # Membaca frame dari kamera
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Mengubah frame ke grayscale
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Mendeteksi wajah
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+
+    # Menjalankan URL tergantung pada deteksi wajah
+    if len(faces) > 0:
+        print("Wajah terdeteksi!")
+        requests.get("http://10.2.3.193/1")
         
-        if not ret:
-            print("Tidak dapat membaca frame.")
-            break
-        
-        # Memutar frame 180 derajat
-        frame_rotated = cv2.rotate(frame, cv2.ROTATE_180)
+        # Menggambar bounding box untuk setiap wajah yang terdeteksi
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+    else:
+        print("Tidak ada wajah terdeteksi.")
+        requests.get("http://10.2.3.193/2")
 
-        # Mengubah ukuran frame untuk mempercepat deteksi
-        frame_resized = cv2.resize(frame_rotated, (640, 480))
+    # Menampilkan frame
+    cv2.imshow('Kamera', frame)
 
-        # Deteksi orang
-        boxes, weights = hog.detectMultiScale(frame_resized, winStride=(8, 8))
+    # Keluar jika tombol 'q' ditekan
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
-        # Menggambar kotak di sekitar orang yang terdeteksi
-        people_detected = len(boxes) > 0
-        for (x, y, w, h) in boxes:
-            cv2.rectangle(frame_resized, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-        # Menampilkan frame
-        cv2.imshow('Deteksi Orang', frame_resized)
-
-        # Kirim permintaan HTTP berdasarkan hasil deteksi
-        if people_detected:
-            requests.get('http://10.2.3.193/2')  # Jika ada orang
-        else:
-            requests.get('http://10.2.3.193/1')  # Jika tidak ada orang
-
-        # Keluar dari loop jika tombol 'q' ditekan
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-# Melepaskan objek dan menutup jendela
+# Melepaskan kamera dan menutup jendela
 cap.release()
 cv2.destroyAllWindows()
