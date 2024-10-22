@@ -40,7 +40,7 @@ while True:
         }
         requests.post("http://10.2.3.161:5000/data", json=payload)
 
-        # Menjalankan URL untuk perangkat lain
+        # Mengambil URL untuk perangkat lain
         requests.get("http://10.2.3.193/1")
 
         # Menggambar bounding box untuk setiap wajah yang terdeteksi
@@ -48,7 +48,7 @@ while True:
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
     else:
         print("Tidak ada wajah terdeteksi.")
-        # Menjalankan URL untuk perangkat lain
+        # Mengambil URL untuk perangkat lain
         requests.get("http://10.2.3.193/2")
 
     # Menampilkan frame
