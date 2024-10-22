@@ -29,20 +29,20 @@ while True:
     # Menjalankan URL tergantung pada deteksi wajah
     if len(faces) > 0:
         print("Wajah terdeteksi!")
-        
+
         # Mengambil waktu saat ini
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        
-        # Mengirim data ke API dengan IP yang benar
+
+        # Mengirim data ke API dengan IP yang benar dan port 5000
         payload = {
             'timestamp': current_time,
             'detected_people': "tidak_dikenali"
         }
-        requests.post("http://10.2.3.161/data", json=payload)
-        
+        requests.post("http://10.2.3.161:5000/data", json=payload)
+
         # Menjalankan URL untuk perangkat lain
         requests.get("http://10.2.3.193/1")
-        
+
         # Menggambar bounding box untuk setiap wajah yang terdeteksi
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
