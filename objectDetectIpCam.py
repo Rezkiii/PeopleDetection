@@ -1,5 +1,3 @@
-python
-
 import cv2
 import requests
 from datetime import datetime
